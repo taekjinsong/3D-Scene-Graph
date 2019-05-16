@@ -398,16 +398,21 @@ class tools_for_visualizing(object):
                 handle_idx.append(str(node["idx"]))
             else:
                 sg.node('struct'+str(node["idx"]), shape='box', style='filled,rounded',
-                    label= obj_cls+
-                    "_"+str(node["idx"])+"\n"+
-                    "("+str(node["3d_pose"][0])+","+
-                        str(node["3d_pose"][1])+","+
-                        str(node["3d_pose"][2])+ ")",
+                    label= obj_cls+"_"+str(node["idx"]), margin = '0.11, 0.0001', width='0.11', height='0',
                     fillcolor= tomato_hex, fontcolor = 'black')
-                if self.args.draw_color:
-                    sg.node('color'+str(node["idx"]), shape= 'box', style= 'filled,rounded',
-                             fillcolor = 'skyblue',fontcolor='black', label=node_feature.ix[node_num]["color_hist"][0][1])
-                    sg.edge('struct'+str(node["idx"]), 'color'+str(node["idx"]))
+                sg.node('attribute_pose_'+str(node["idx"]), shape='box', style='filled, rounded',
+                    label = "("+str(round(float(node["3d_pose"][0])/5000.0, 1))+","+
+                                str(round(float(node["3d_pose"][1])/5000.0, 1))+","+
+                                str(round(float(node["3d_pose"][2])/5000.0, 1))+ ")",
+                    margin = '0.11, 0.0001', width='0.11', height='0',
+                    fillcolor= blue_hex, fontcolor='black')
+                
+                sg.node('attribute_color_'+str(node["idx"]), shape='box', style='filled, rounded',
+                    label = str(node_feature.ix[node_num]["color_hist"][0][1]),
+                    margin = '0.11, 0.0001', width='0.11', height='0',
+                    fillcolor= blue_hex, fontcolor='black')
+                sg.edge('struct'+str(node["idx"]), 'attribute_pose_'+str(node["idx"]))
+                sg.edge('struct'+str(node["idx"]), 'attribute_color_'+str(node["idx"]))
                 '''
                 # Apply color to scene graph node
                 # Works for later
@@ -475,7 +480,8 @@ class tools_for_visualizing(object):
             relation_set = set(relation_set)
             #print(len(relation_set))
 
-        pale_rgb = [152,251,152]
+        #pale_rgb = [152,251,152]
+        pale_rgb = [112,191,64]
         pale_hex = webcolors.rgb_to_hex(pale_rgb)
         for rel_num in range(len(relation_set)):
             rel = relation_set.pop()
@@ -489,7 +495,7 @@ class tools_for_visualizing(object):
                     handle = True
             if ( (not tile) and (not handle)):
                 sg.node('rel'+str(rel_num), shape= 'box', style= 'filled, rounded', fillcolor= pale_hex, fontcolor= 'black',
-                        label= str(test_set.predicate_classes[rel[1]]))
+                        margin = '0.11, 0.0001', width = '0.11', height='0' , label= str(test_set.predicate_classes[rel[1]]))
                 sg.edge('struct'+str(rel[0]), 'rel'+str(rel_num))
                 sg.edge('rel'+str(rel_num), 'struct'+str(rel[2]))
 
